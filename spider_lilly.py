@@ -19,8 +19,34 @@ def draw_curved_branch(img, p1, p2, color, thickness):
     cv2.polylines(img, [pts], False, color, thickness, cv2.LINE_AA)
 
 
-def drawing_spider_lilly(img, center, radius):
-    pass
+def drawing_spider_lilly(img, center, radius,bloom,angle):
+    cx,cy=center
+    current_r=int(radius * (0.25 + 0.75 * bloom))
+    spread=0.15 + 0.85 * bloom
+
+    for i in range(6):
+        base_angle=math.radians(angle + i * 60)
+        petal_pts=[]
+
+        for step in np.linspace(0.05,1.0,10):
+            r=step * current_r
+            w_angle=math.sin(step * math.pi) * 0.22 * spread
+            curl=(step**2) * 0.35 * spread
+            petal_pts.append([int(cx + r * math.cos(base_angle + curl - w_angle)),
+                              int(cy + r * math.sin(base_angle + curl - w_angle))])
+
+        for step in np.linspace(1.0,0.05,10):
+            r=step * current_r
+            w_angle=math.sin(step * math.pi) * 0.22 * spread
+            curl=(step**2) * 0.35 * spread
+            petal_pts.append([int(cx + r * math.cos(base_angle + curl - w_angle)),
+                              int(cy + r * math.sin(base_angle + curl - w_angle))])
+
+        cv2.fillPoly(img,[np.array(petal_pts,np.int32)],(25,20,210)),cv2.LINE_AA
+    cv2.circle(img,(cx,cy),int(7 + 5 *(1-bloom)),(20,15,140),-1,cv2.LINE_AA)
+
+
+
 
 
 mp_hands = mp.solutions.hands
@@ -61,8 +87,7 @@ while True:
             root_points = (w // 2 , h - 40)
             draw_curved_branch(frame,root_points,(index_x,index_y),(60,190,80),2)
 
-            test_radius = int(10 + 40 * bloom)
-            cv2.circle(frame, (index_x, index_y), test_radius, (0, 0, 255), -1)
+            drawing_spider_lilly(frame, (index_x, index_y), 90, bloom, angle)
     cv2.imshow("Tokyo Ghoul - Spider Lilly Vision", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
