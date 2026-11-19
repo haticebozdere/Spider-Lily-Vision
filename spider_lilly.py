@@ -26,7 +26,17 @@ def drawing_spider_lilly(img, center, radius,bloom,angle):
 
     for i in range(6):
         base_angle=math.radians(angle + i * 60)
+        if bloom > 0.15:
+            statement_pts=[]
+            for step in np.linspace(0,1,12):
+                r=step * (current_r * 1.55)
+                theta=base_angle + math.radians(22) + (step** 2) * 0.45 * spread
+                statement_pts.append([int(cx + r * math.cos(theta)),int(cy + r * math.sin(theta))])
+            cv2.polylines(img,[np.array(statement_pts,np.int32)],False,(50,50,245),1,cv2.LINE_AA)
+            cv2.circle(img,tuple(statement_pts[-1]),2,(130,160,255),-1,cv2.LINE_AA)
+
         petal_pts=[]
+
 
         for step in np.linspace(0.05,1.0,10):
             r=step * current_r
@@ -43,7 +53,7 @@ def drawing_spider_lilly(img, center, radius,bloom,angle):
                               int(cy + r * math.sin(base_angle + curl - w_angle))])
 
         cv2.fillPoly(img,[np.array(petal_pts,np.int32)],(25,20,210)),cv2.LINE_AA
-    cv2.circle(img,(cx,cy),int(7 + 5 *(1-bloom)),(20,15,140),-1,cv2.LINE_AA)
+    cv2.circle(img,(cx,cy),int(7 + 5 *bloom ),(20,15,140),-1,cv2.LINE_AA)
 
 
 
